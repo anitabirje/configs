@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- configuration file for LogBack (slf4J implementation)
+See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-through-the-java-loggers/ -->
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <!-- To enable JMX Management -->
+    <jmxConfigurator/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder><pattern>%d %highlight(%-5level) %magenta(%logger{0}) - %X{MDC_user:--} - %msg%n</pattern></encoder>
+    </appender>
+
+    <property name="CLOUDWATCH_LOG_FILE"
+              value="${CLOUDWATCH_LOG_PATH:-/tmp/logs/service-name}/processing.log}"/>
+    <appender name="CLOUDWATCH_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${CLOUDWATCH_LOG_FILE}</file>
+        <encoder><pattern>%d %-5level %logger{0} - %X{MDC_user:--} - %msg%n</pattern></encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${CLOUDWATCH_LOG_FILE}.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+    <root level="info">
+        <appender-ref ref="console"/>
+        <appender-ref ref="CLOUDWATCH_LOG"/>
+    </root>
+
+    <logger name="au.com.anitab" level="DEBUG" additivity="false">
+        <appender-ref ref="console"/>
+        <appender-ref ref="CLOUDWATCH_LOG" />
+    </logger>
+
+
+    <property name="EVENT_LOG_FILE"
+              value="${CLOUDWATCH_LOG_PATH:-/tmp/logs/service-name}/event.log}"/>
+    <appender name="SECURITY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${EVENT_LOG_FILE}</file>
+        <encoder><pattern>%d %msg%n</pattern></encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${EVENT_LOG_FILE}.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+    <logger name="event_log" level="TRACE" additivity="false">
+        <appender-ref ref="SECURITY_FILE"/>
+    </logger>
+
+
+    <!--<logger name="au.com.anitab.services" level="DEBUG"/>-->
+    <!--<logger name="org.springframework.messaging" level="DEBUG"/>-->
+    <!--<logger name="org.springframework" level="TRACE"/>-->
+    <!--<logger name="org.springframework.security" level="DEBUG"/>-->
+    <!--<logger name="org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod" level="DEBUG"/>-->
+
+    <!--<logger name="com.amazonaws" level="TRACE"/>-->
+    <!--<logger name="org.apache.http.wire" level="TRACE"/>-->
+
+</configuration>
+
+
