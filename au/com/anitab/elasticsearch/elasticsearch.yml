@@ -1,0 +1,7 @@
+node.name: myelastic 
+cluster.name: anitab-dev
+
+network.host: 127.0.0.1
+http.port: 9200
+transport.tcp.port: 9300
+action.destructive_requires_name: true
